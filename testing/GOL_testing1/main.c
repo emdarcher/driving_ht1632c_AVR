@@ -12,6 +12,8 @@ static char buf[8]; /* general purpose */
 
 void clear_fb(void);
 
+void push_fb(void);
+
 int main(void)
 {
     //init stuff
@@ -24,13 +26,8 @@ int main(void)
             clear_fb();
             fb[c]=0xff;
             //ht1632c_clear_fb(fb);
-            char i,j;
-            for(i=0;i<32;i++){
+            push_fb();
             
-            ht1632c_data8(j, fb[i]);
-            j+=2;
-            //_delay_ms(1);
-            }
             _delay_ms(100);
             //ht1632c_flush_fb(fb);
             //_delay_ms(10);
@@ -40,9 +37,17 @@ int main(void)
 }
 
 void clear_fb(void){
-    char count;
+    uint8_t count;
     for(count=0;count<32;count++){
         fb[count]=0;
     }
-    
+}
+
+void push_fb(void){
+    uint8_t i=0;
+    uint8_t j=0;
+    for(i=0;i<32;i++){
+        ht1632c_data8(j,fb[i]);
+        j+=2;
+    }
 }
