@@ -16,12 +16,12 @@
 #define BUTTON_PORT PORTB
 #define BUTTON_PIN PINB
 
-#define DO_YOU_WANT_DIFF_DEBUG 1
+#define DO_YOU_WANT_DIFF_DEBUG 0
 #define DIFF_DEBUG_DDR DDRA
 #define DIFF_DEBUG_PORT PORTA
 #define DIFF_DEBUG_BIT_LEN 7 //starting with 0 end with this bit
 
-#define LOW_DIFF_THRESHOLD 20
+#define LOW_DIFF_THRESHOLD 42
 
 static uint8_t bright = 0;  /* current LED brightness */
 static uint8_t fb[X_AXIS_LEN];      /* framebuffer */
@@ -41,6 +41,9 @@ uint8_t get_difference(uint8_t a[],uint8_t b[]);
 
 uint8_t low_diff_count=0;
 uint8_t old_low_diff_count=0;
+
+uint16_t med_diff_count=0;
+uint16_t old_med_diff_count=0;
 
 void init_button(void);
 
@@ -205,9 +208,17 @@ void get_new_states(void){
     //}
     if((diff_val <= 4)){
         low_diff_count++;
-    }else{
+        
+    }
+    else if((diff_val<=8)){
+        med_diff_count++;
+    }
+    else{
         if(low_diff_count > 0){
         low_diff_count--;
+        }
+        if(med_diff_count >0){
+        med_diff_count--;
         }
     }
     
@@ -219,6 +230,11 @@ void get_new_states(void){
         low_diff_count=0;
         reset_grid();
     }
+    else if(med_diff_count > 196){
+        med_diff_count=0;
+        reset_grid();
+    }
+    
     
     else{
     
