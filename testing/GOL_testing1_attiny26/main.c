@@ -11,13 +11,14 @@
 #define X_AXIS_LEN 32
 #define Y_AXIS_LEN 8
 
-#define BUTTON_BIT 2
-#define BUTTON_DDR DDRD
-#define BUTTON_PORT PORTD
+#define BUTTON_BIT 6
+#define BUTTON_DDR DDRB
+#define BUTTON_PORT PORTB
+#define BUTTON_PIN PINB
 
-#define DO_YOU_WANT_DIFF_DEBUG 0
-#define DIFF_DEBUG_DDR DDRC
-#define DIFF_DEBUG_PORT PORTC
+#define DO_YOU_WANT_DIFF_DEBUG 1
+#define DIFF_DEBUG_DDR DDRA
+#define DIFF_DEBUG_PORT PORTA
 #define DIFF_DEBUG_BIT_LEN 7 //starting with 0 end with this bit
 
 #define LOW_DIFF_THRESHOLD 20
@@ -210,7 +211,8 @@ void get_new_states(void){
         }
     }
     
-    if(bit_is_clear(PIND, BUTTON_BIT)){
+    
+    if(bit_is_clear(BUTTON_PIN, BUTTON_BIT)){
         reset_grid();
     } 
     else if(low_diff_count > LOW_DIFF_THRESHOLD){
