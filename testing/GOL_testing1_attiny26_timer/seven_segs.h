@@ -13,23 +13,21 @@ F       B
 |___G___|
 |       |
 E       C
-|___D___|
+|___D___| O dp
 */
-/*
-pinout of display
-        ________     
-C1    --| ---- |--  G1
-E1    --|digit1|--  A1
-D1    --| ---- |--  F1
-Vcc1  --|      |--  B1
-Vcc0  --| ---- |--  B0
-D0    --|digit0|--  F0
-E0    --| ---- |--  A0
-C0    --|______|--  G0
 
-common adode for each digit
-pull segment's pin LOW to turn it on
-*/
+/*
+ * pinout of an individual display
+ *      |------|
+ * GND--|  __  |--  A
+ * F  --| |  | |--  B
+ * G  --| |--| |--  C
+ * E  --| |__| |-- dp
+ * D  --|_____O|--GND
+ * 
+ * 
+ * the display is common cathode
+ */
 
 //these are the bits of the shift register
 //that go to particular segments
@@ -69,5 +67,7 @@ void msg_error(void);
 
 void write_number(int16_t number);
 void write_digit(int8_t num, uint8_t dig);
+
+void write_segs(uint8_t byte);
 
 #endif
