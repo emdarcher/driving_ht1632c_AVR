@@ -32,7 +32,7 @@ EXTRA_SOURCE_FILES =
 
 PROGRAMMER_TYPE = stk500v2
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
-PROGRAMMER_ARGS = -P /dev/ttyUSB0 -B 8 	
+PROGRAMMER_ARGS = -P /dev/ttyUSB0 -B8 	
 
 ##########------------------------------------------------------##########
 ##########                   Makefile Magic!                    ##########

@@ -1,8 +1,5 @@
 //header file with seven segment stuff
 
-#ifndef SEVEN_SEGS
-#define SEVEN_SEGS
-
 #include <stdint.h>
 
 /*
@@ -53,21 +50,21 @@ pull segment's pin LOW to turn it on
 //remember to add any newly defines digits here
 #define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 | DIG_3 )
 
-extern const uint16_t digit_bits[];
-extern const uint8_t  num_digits;
+const uint16_t digit_bits[] = { DIG_0, DIG_1, DIG_2, DIG_3 };
+const uint8_t  num_digits = sizeof(digit_bits)/2;
 
-extern const uint8_t number_seg_bytes[];
-
-//extern uint8_t SPI_out_byte;
-extern uint16_t digits_out;
-extern uint8_t out_byte;
-
-//void init_SPI1(void);
-void init_digit_pins(void);
-//void write_SPI1(uint8_t out_byte);
-void msg_error(void);
-
-void write_number(int16_t number);
-void write_digit(int8_t num, uint8_t dig);
-
-#endif
+const uint8_t number_seg_bytes[] = {
+//       unconfigured
+//ABCDEFG^
+0b11111100,//0
+0b01100000,//1
+0b11011010,//2
+0b11110010,//3
+0b01100110,//4
+0b10110110,//5
+0b10111110,//6
+0b11100000,//7
+0b11111110,//8
+0b11100110,//9
+0b10011110, //'E' for error
+};

@@ -16,12 +16,15 @@
 #define BUTTON_PORT PORTB
 #define BUTTON_PIN PINB
 
+#define DO_YOU_WANT_BUTTON_INT0 1
+
 #define DO_YOU_WANT_DIFF_DEBUG 0
 #define DIFF_DEBUG_DDR DDRA
 #define DIFF_DEBUG_PORT PORTA
 #define DIFF_DEBUG_BIT_LEN 7 //starting with 0 end with this bit
 
 #define LOW_DIFF_THRESHOLD 42
+#define MED_DIFF_THRESHOLD 196
 
 static uint8_t bright = 0;  /* current LED brightness */
 uint8_t fb[X_AXIS_LEN];      /* framebuffer */
@@ -71,6 +74,17 @@ int main(void)
     l--;
     }
     #endif
+    
+    #if DO_YOU_WANT_BUTTON_INT0
+    //if you want a button to use INT0 for button on PB6
+        
+        //setup INT0 to trigger on falling edge
+        MCUCR |= (1<<ISC01);
+        
+        //enable the INT0 external interrupt
+        GIMSK |= (1<<INT0);
+        
+    #endif
     //test glider
     //fb[29] = 0b00100000;
     //fb[30] = 0b00101000;
@@ -119,8 +133,6 @@ void reset_grid(void){
         //fb[k] = ((uint8_t)rand & 0x8f);
         fb[k] = ((uint8_t)rand() & 0xff);
     }
-
-
 }
 
 uint8_t get_current_pixel_state(uint8_t in[], int8_t x,int8_t y){
@@ -215,14 +227,15 @@ void get_new_states(void){
     }
     
     
-    if(bit_is_clear(BUTTON_PIN, BUTTON_BIT)){
-        reset_grid();
-    } 
-    else if(low_diff_count > LOW_DIFF_THRESHOLD){
+    //if(bit_is_clear(BUTTON_PIN, BUTTON_BIT)){
+    //    reset_grid();
+    //} 
+    //else 
+    if(low_diff_count > LOW_DIFF_THRESHOLD){
         low_diff_count=0;
         reset_grid();
     }
-    else if(med_diff_count > 196){
+    else if(med_diff_count > MED_DIFF_THRESHOLD){
         med_diff_count=0;
         reset_grid();
     }
@@ -272,14 +285,34 @@ void init_timer0(void){
 
 ISR(TIMER0_OVF0_vect){
     //timer overflow
+    
+    //counts times, so it nows when to actually update the display.
+    //because it can't every time it overflows because it would be
+    //around 30FPS, and the game of life would go way too fast.
     if(timer_overflow_count<15){
         timer_overflow_count++;
     } 
     else{
-        timer_overflow_count=0;
+        timer_overflow_count=0;//reset the count
         
+        //push framebuffer to the display
         push_fb();
-    
+        
+        //get the new states and add them to the framebuffer,
+        //or reset the display if there isn't enough action
         get_new_states();
     }
 }
+
+
+#if DO_YOU_WANT_BUTTON_INT0
+//if you want a button to use INT0 for button on PB6
+
+ISR(INT0_vect){
+//INT0 ISR
+    
+    //reset and randomize
+    reset_grid();
+}
+
+#endif
