@@ -5,6 +5,7 @@
 #include "seven_segs.h"
 //#include <stm32f10x.h>
 #include <avr/io.h>
+#include <util/delay.h>
 
 const uint16_t digit_bits[] = { DIG_0, DIG_1, DIG_2, DIG_3 };
 const uint8_t  num_digits = sizeof(digit_bits)/2;
@@ -31,24 +32,18 @@ uint8_t out_byte;
 
 void init_digit_pins(void){
     
-    /*
-    //config rcc clocks and enable GPIO C
-    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-    
-    //setup GPIO PC0-PC3 for output push pull max speed 50MHz (too fast?)
-    GPIOC->CRL |= ( GPIO_CRL_MODE0  |
-                    GPIO_CRL_MODE1  |
-                    GPIO_CRL_MODE2  |
-                    GPIO_CRL_MODE3  );
-    GPIOC->CRL &= ~(GPIO_CRL_CNF0   |
-                    GPIO_CRL_CNF1   |
-                    GPIO_CRL_CNF2   |
-                    GPIO_CRL_CNF3   );
-                    
-    */
-    
+    //setup bit 0 in DDRA for output for digit 3
+    DDRA |= DIG_3;
+    //setup bits 0-2 in DDRB for output for digits 0-2
+    DDRB |= (DIG_0|DIG_1|DIG_2);
     
 }
+
+void init_segment_pins(void){
+    //setup all segs as output
+    SEGMENT_DDR |= ALL_SEGS;
+}
+
 /*
 void init_SPI1(void){
     //configure clocks for the stuff
@@ -139,21 +134,24 @@ void write_digit(int8_t num, uint8_t dig){
     out_byte = number_seg_bytes[10];
     }
     
-    write_segs(out_byte);
+    SEGMENT_PORT = byte;
+    //write_segs(out_byte);
     
 	//write_SPI1(SPI_out_byte);
     //SPI1->DR = SPI_out_byte;
 	for( k = 0; k < num_digits; k++){
-		if ( k == dig ){
-			//digits_out |= digit_bits[k];
-            GPIOC->BSRR |= digit_bits[k];
+		uint8_t digit_port = (dig==3) ? PORTA : PORTB;
+        
+        if ( k == dig ){
+			digit_port |= digit_bits[k];
 		} else {
 			//digits_out &= ~(digit_bits[k]);
-            GPIOC->BRR |= (digit_bits[k]);
+            //GPIOC->BRR |= (digit_bits[k]);
+            digit_port &= ~(digit_bits[k]);
 		}
 	}
     //GPIOA->BSRR |= (1<<4); //put SS/CS high again to latch shift register
-	
+	_delay_ms(1);
     //Delay(1);
 }
 
@@ -174,4 +172,10 @@ void write_number(int16_t number){
 		} else {
 			msg_error();
 		}
+}
+
+void write_segs(uint8_t byte){
+    
+    SEGMENT_PORT = byte;
+    
 }

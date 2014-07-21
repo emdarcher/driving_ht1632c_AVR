@@ -28,8 +28,17 @@ E       C
  * 
  * the display is common cathode
  */
+ 
+ /*
+  * The digit pins will be connected to NPN transistors
+  * that will sink the corresponding digit's cathodes
+  * 
+  */
 
-//these are the bits of the shift register
+#define SEGMENT_DDR DDRA
+#define SEGMENT_PORT PORTA
+
+//these are the bits 
 //that go to particular segments
 #define SEG_A (1<<7)
 #define SEG_B (1<<6)
@@ -46,7 +55,7 @@ E       C
 #define DIG_0 (1<<0)
 #define DIG_1 (1<<1)
 #define DIG_2 (1<<2)
-#define DIG_3 (1<<3)
+#define DIG_3 (1<<0)//note this goes on PORTA
 
 //remember to add any newly defines digits here
 #define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 | DIG_3 )
@@ -62,6 +71,8 @@ extern uint8_t out_byte;
 
 //void init_SPI1(void);
 void init_digit_pins(void);
+void init_segment_pins(void);
+
 //void write_SPI1(uint8_t out_byte);
 void msg_error(void);
 
