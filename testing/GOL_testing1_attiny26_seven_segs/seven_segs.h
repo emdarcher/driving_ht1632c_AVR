@@ -60,8 +60,9 @@ E       C
 //remember to add any newly defines digits here
 #define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 | DIG_3 )
 
+#define num_digits 4
 extern const uint16_t digit_bits[];
-extern const uint8_t  num_digits;
+//extern const uint8_t  num_digits;
 
 extern const uint8_t number_seg_bytes[];
 
@@ -69,12 +70,9 @@ extern const uint8_t number_seg_bytes[];
 extern uint16_t digits_out;
 extern uint8_t out_byte;
 
-//void init_SPI1(void);
 void init_digit_pins(void);
 void init_segment_pins(void);
 
-
-//void write_SPI1(uint8_t out_byte);
 void msg_error(void);
 
 void write_number(int16_t number);
