@@ -4,7 +4,7 @@
 #define SEVEN_SEGS
 
 #include <stdint.h>
-
+#include <avr/eeprom.h>
 /*
 segments
  ---A---
@@ -60,9 +60,11 @@ E       C
 //remember to add any newly defines digits here
 #define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 | DIG_3 )
 
-#define num_digits 4
+#define INIT_SEGMENT_PINS SEGMENT_DDR |= ALL_SEGS
+
+//#define num_digits 4
 extern const uint16_t digit_bits[];
-//extern const uint8_t  num_digits;
+extern const uint8_t  num_digits;
 
 extern const uint8_t number_seg_bytes[];
 

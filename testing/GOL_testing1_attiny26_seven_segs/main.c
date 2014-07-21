@@ -8,6 +8,7 @@
 #include "ht1632c.h"
 #include <avr/interrupt.h>
 #include "seven_segs.h"
+#include <avr/eeprom.h>
 
 #define X_AXIS_LEN 32
 #define Y_AXIS_LEN 8
@@ -19,19 +20,21 @@
 
 #define DO_YOU_WANT_BUTTON_INT0 1
 
-#define DO_YOU_WANT_DIFF_DEBUG 0
-#define DIFF_DEBUG_DDR DDRA
-#define DIFF_DEBUG_PORT PORTA
-#define DIFF_DEBUG_BIT_LEN 7 //starting with 0 end with this bit
+#define DO_YOU_WANT_DEBUG 1
+#define DEBUG_DDR DDRA
+#define DEBUG_PORT PORTA
+#define DEBUG_BIT_LEN 7 //starting with 0 end with this bit
 
 #define LOW_DIFF_THRESHOLD 42
 #define MED_DIFF_THRESHOLD 196
 
-static uint8_t bright = 0;  /* current LED brightness */
+//static uint8_t bright = 0;  /* current LED brightness */
 uint8_t fb[X_AXIS_LEN];      /* framebuffer */
-static char buf[8]; /* general purpose */
+//static char buf[8]; /* general purpose */
 
- uint8_t state_storage[32]; //area to store pixel states
+uint8_t state_storage[32]; //area to store pixel states
+
+volatile uint8_t update_gen_flag = 0;
 
 void clear_fb(void);
 
@@ -53,7 +56,17 @@ volatile uint16_t generation_count=0;
 
 volatile uint8_t timer_overflow_count=0;
 
-void init_button(void);
+#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
+/*inline init_button(void);
+inline init_button(void){
+
+    BUTTON_DDR &= ~(1<<BUTTON_BIT);
+    //enable pullup
+    BUTTON_PORT |= (1<<BUTTON_BIT);
+    
+
+}*/
+
 void init_timer0(void);
 void reset_grid(void);
 
@@ -62,18 +75,42 @@ int main(void)
     //init stuff
     ht1632c_init();
     
-    init_button();
+    #if DO_YOU_WANT_BUTTON_INT0==0
+    //init_button();
+    INIT_BUTTON;
+    
+    /*BUTTON_DDR &= ~(1<<BUTTON_BIT);
+    //enable pullup
+    BUTTON_PORT |= (1<<BUTTON_BIT);
+    */
+    #endif
+    
     reset_grid();
     
     init_timer0();
     
-    #if DO_YOU_WANT_DIFF_DEBUG
+    #if DO_YOU_WANT_DEBUG==0
+    init_digit_pins();
+    init_segment_pins();
+    #endif
+    
+    //init segment stuff
+    /*
+    //setup bit 0 in DDRA for output for digit 3
+    DDRA |= DIG_3;
+    //setup bits 0-2 in DDRB for output for digits 0-2
+    DDRB |= (DIG_0|DIG_1|DIG_2);
+     //setup all segs as output
+    SEGMENT_DDR |= ALL_SEGS;
+    */
+    
+    #if DO_YOU_WANT_DEBUG
     //for debug
-    uint8_t l = DIFF_DEBUG_BIT_LEN;
-    while(l>0){
-    DIFF_DEBUG_DDR |= (1<<l);
+    int8_t l = DEBUG_BIT_LEN;
+    while(l>=0){
+    DEBUG_DDR |= (1<<l);
     l--;
-    }
+    }//while(l>=0);
     #endif
     
     #if DO_YOU_WANT_BUTTON_INT0
@@ -91,11 +128,25 @@ int main(void)
     //fb[30] = 0b00101000;
     //fb[31] = 0b00110000;
     
+    uint16_t g_count;
+    
     //enable global interrupts
     sei();
     
     while(1){
-        //write_number(generation_count);
+    
+        //uint16_t g_count;
+        if(update_gen_flag==1){
+        g_count = generation_count;
+        update_gen_flag=0;
+        }
+        #if DO_YOU_WANT_DEBUG==0
+        write_number(g_count);
+        #endif
+        
+        #if DO_YOU_WANT_DEBUG==1
+        DEBUG_PORT = ~g_count;
+        #endif
     }
 }
 
@@ -114,22 +165,22 @@ void push_fb(void){
         j+=2;
     }
 }
-
-void init_button(void){
+/*
+static inline init_button(void){
 
     BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
     BUTTON_PORT |= (1<<BUTTON_BIT);
     
 
-}
+}*/
 
 void reset_grid(void){
 
     uint8_t k;
     for(k=0;k<X_AXIS_LEN;k++){
         //int rand=89;
-        uint8_t thing = (uint8_t)rand();
+        //uint8_t thing = (uint8_t)rand();
         //rand=(rand*109+89)%251; 
         //fb[k] = ((uint8_t)rand & 0x8f);
         fb[k] = ((uint8_t)rand() & 0xff);
@@ -153,7 +204,7 @@ uint8_t get_new_pixel_state(uint8_t in_states[], int8_t x,int8_t y){
     
     uint8_t n=0;
     uint8_t state_out=0;
-    uint8_t p;
+    //uint8_t p;
     //check on neighbors
     //for(p=y-1;p<y+1;y++){
     //if(get_current_pixel_state(in_states, x-1,p)){n++;}
@@ -182,15 +233,17 @@ void get_new_states(void){
 //find all the new states and put them in the buffer
     
     //copy the current stuff into storage
-    int8_t x=0;
+    int8_t x=X_AXIS_LEN;
     //for(x=0;x<X_AXIS_LEN;x++){
     //    state_storage[x] = fb[x];
     //}
     
     //now get all new states
-    for(x=0;x<X_AXIS_LEN;x++){
-        int8_t y=0;
-        for(y=0;y<Y_AXIS_LEN;y++){
+    //for(x=0;x<X_AXIS_LEN;x++){
+    while(x--){
+        int8_t y=Y_AXIS_LEN;
+        //for(y=0;y<Y_AXIS_LEN;y++){
+        while(y--){
             
             if(get_new_pixel_state(fb, x, y)==1){
                 //fb[x] |= (1<<y);
@@ -204,10 +257,10 @@ void get_new_states(void){
     uint8_t diff_val= get_difference(state_storage,fb);
     //PORTC = get_difference(state_storage,fb);
     
-    #if DO_YOU_WANT_DIFF_DEBUG
+    /*#if DO_YOU_WANT_DEBUG
     //for debug
-    DIFF_DEBUG_PORT = diff_val;
-    #endif
+    DEBUG_PORT = diff_val;
+    #endif*/
     
     //if((get_difference(state_storage,fb)<10)){
     //        reset_grid();
@@ -218,7 +271,6 @@ void get_new_states(void){
     //}
     if((diff_val <= 4)){
         low_diff_count++;
-        
     }
     else if((diff_val<=8)){
         med_diff_count++;
@@ -251,12 +303,14 @@ void get_new_states(void){
     else{
     
     //int8_t x=0;
+    //x=X_AXIS_LEN;
     for(x=0;x<X_AXIS_LEN;x++){
+    //while(x--){
         //state_storage[x] = fb[x];
         fb[x] = state_storage[x];
     }
     
-    generation_count++;
+    //generation_count++;
     }
 }
 
@@ -266,9 +320,11 @@ uint8_t get_difference(uint8_t a[],uint8_t b[])
 	uint8_t x_v,y_v,diff=0;
 
 	for(x_v=0; x_v < X_AXIS_LEN; x_v++)
-	{
+	//while(x_v--)
+    {
 		for(y_v=0; y_v < Y_AXIS_LEN; y_v++)
-		{
+		//while(y_v--)
+        {
 			if(( (get_current_pixel_state(a,x_v,y_v)==1) && (get_current_pixel_state(b,x_v,y_v) == 0)) 
             || ((get_current_pixel_state(a,x_v,y_v)==0) && (get_current_pixel_state(b,x_v,y_v)==1)))
             {
@@ -303,14 +359,16 @@ ISR(TIMER0_OVF0_vect){
     } 
     else{
         timer_overflow_count=0;//reset the count
-        
+        generation_count++;
         //push framebuffer to the display
         push_fb();
-        
+        //generation_count++;
         //get the new states and add them to the framebuffer,
         //or reset the display if there isn't enough action
         get_new_states();
+        update_gen_flag=1;
     }
+    //update_gen_flag=1;
 }
 
 

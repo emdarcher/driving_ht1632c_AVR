@@ -7,8 +7,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+//inline init_digit_pins(void);
+
 const uint16_t digit_bits[] = { DIG_0, DIG_1, DIG_2, DIG_3 };
-//const uint8_t  num_digits = sizeof(digit_bits)/2;
+const uint8_t  num_digits = sizeof(digit_bits)/2;
 
 const uint8_t number_seg_bytes[] = {
 //       unconfigured
@@ -62,18 +64,30 @@ void write_digit(int8_t num, uint8_t dig){
 	//write_SPI1(SPI_out_byte);
     //SPI1->DR = SPI_out_byte;
 	for( k = 0; k < num_digits; k++){
-		uint8_t digit_port = (dig==3) ? PORTA : PORTB;
+		//uint8_t digit_port = (dig==3) ? PORTA : PORTB;
         
         if ( k == dig ){
-			digit_port |= digit_bits[k];
+			if(dig==3)
+            {
+                PORTA |= digit_bits[k];
+            }else{
+                PORTB |= digit_bits[k];
+            }
+            //digit_port |= digit_bits[k];
 		} else {
 			//digits_out &= ~(digit_bits[k]);
             //GPIOC->BRR |= (digit_bits[k]);
-            digit_port &= ~(digit_bits[k]);
-		}
+            //digit_port &= ~(digit_bits[k]);
+            if(dig==3)
+            {
+                PORTA &= ~digit_bits[k];
+            }else{
+                PORTB &= ~digit_bits[k];
+            }
+        }
 	}
     //GPIOA->BSRR |= (1<<4); //put SS/CS high again to latch shift register
-	_delay_ms(1);
+	//_delay_ms(1);
     //Delay(1);
 }
 

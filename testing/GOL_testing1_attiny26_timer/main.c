@@ -2,7 +2,7 @@
 //just makes a line travel across the display
 
 #include <avr/io.h>
-//#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <util/delay.h>
 #include "ht1632c.h"
