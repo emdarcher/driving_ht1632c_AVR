@@ -10,7 +10,8 @@
 //inline init_digit_pins(void);
 
 const uint16_t digit_bits[] = { DIG_0, DIG_1, DIG_2, DIG_3 };
-const uint8_t  num_digits = sizeof(digit_bits)/2;
+//const uint8_t  num_digits = sizeof(digit_bits)/2;
+const uint8_t num_digits = 3;
 
 const uint8_t number_seg_bytes[] = {
 //       unconfigured
@@ -35,7 +36,7 @@ uint8_t out_byte;
 void init_digit_pins(void){
     
     //setup bit 0 in DDRA for output for digit 3
-    DDRA |= DIG_3;
+    //DDRA |= DIG_3;
     //setup bits 0-2 in DDRB for output for digits 0-2
     DDRB |= (DIG_0|DIG_1|DIG_2);
     
@@ -67,23 +68,23 @@ void write_digit(int8_t num, uint8_t dig){
 		//uint8_t digit_port = (dig==3) ? PORTA : PORTB;
         
         if ( k == dig ){
-			if(dig==3)
-            {
-                PORTA |= digit_bits[k];
-            }else{
+			//if(dig==3)
+           // {
+            //    PORTA |= digit_bits[k];
+            //}else{
                 PORTB |= digit_bits[k];
-            }
+            //}
             //digit_port |= digit_bits[k];
 		} else {
 			//digits_out &= ~(digit_bits[k]);
             //GPIOC->BRR |= (digit_bits[k]);
             //digit_port &= ~(digit_bits[k]);
-            if(dig==3)
-            {
-                PORTA &= ~digit_bits[k];
-            }else{
+            //if(dig==3)
+            //{
+            //    PORTA &= ~digit_bits[k];
+            //}else{
                 PORTB &= ~digit_bits[k];
-            }
+            //}
         }
 	}
     //GPIOA->BSRR |= (1<<4); //put SS/CS high again to latch shift register
@@ -99,7 +100,7 @@ void write_number(int16_t number){
 		uint8_t h;
 		int16_t format_num = number;
 		//check if number is too big ot not
-		if ((number < 10000) && (number >= 0)){
+		if ((number < 1000) && (number >= 0)){
 			//formats number based on digits to correct digits on display
 			for(h=0;h < num_digits;h++){
 				write_digit(format_num % 10, h);

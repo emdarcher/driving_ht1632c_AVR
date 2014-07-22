@@ -20,7 +20,7 @@
 
 #define DO_YOU_WANT_BUTTON_INT0 1
 
-#define DO_YOU_WANT_DEBUG 1
+#define DO_YOU_WANT_DEBUG 0
 #define DEBUG_DDR DDRA
 #define DEBUG_PORT PORTA
 #define DEBUG_BIT_LEN 7 //starting with 0 end with this bit
@@ -134,7 +134,7 @@ int main(void)
     sei();
     
     while(1){
-    
+        
         //uint16_t g_count;
         if(update_gen_flag==1){
         g_count = generation_count;
@@ -142,6 +142,7 @@ int main(void)
         }
         #if DO_YOU_WANT_DEBUG==0
         write_number(g_count);
+        //write_number(generation_count);
         #endif
         
         #if DO_YOU_WANT_DEBUG==1
