@@ -15,13 +15,13 @@ MAIN = main.c
 ## If you've split your program into multiple files, 
 ## include the additional .c source (in same directory) here 
 ## (and include the .h files in your foo.c)
-#LOCAL_SOURCE = 
+#LOCAL_SOURCE =
 LOCAL_SOURCE = ht1632c.c
 LOCAL_SOURCE += seven_segs.c
 
 ## Here you can link to one more directory (and multiple .c files)
-# EXTRA_SOURCE_DIR = 
-# EXTRA_SOURCE_FILES =
+# EXTRA_SOURCE_DIR = ../AVR-Programming-Library/
+# EXTRA_SOURCE_FILES = USART.c
 EXTRA_SOURCE_DIR = 
 EXTRA_SOURCE_FILES = 
 
@@ -33,7 +33,7 @@ EXTRA_SOURCE_FILES =
 
 PROGRAMMER_TYPE = stk500v2
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
-PROGRAMMER_ARGS = -P /dev/ttyUSB0 -B8 
+PROGRAMMER_ARGS = -P /dev/ttyUSB0 -B8 	
 
 ##########------------------------------------------------------##########
 ##########                   Makefile Magic!                    ##########
@@ -170,36 +170,31 @@ flash_109: flash
 #LFUSE = 0xe1
 #HFUSE = 0xd9
 
-#default 1MHz fuses attiny26
-LFUSE = 0xe1
-HFUSE = 0xf7
 
 ## Generic 
-FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m 
-#-U efuse:w:$(EFUSE):m 
+#FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m -U efuse:w:$(EFUSE):m 
 
-fuses: 
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) \
+#fuses: 
+#	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) \
 	           $(PROGRAMMER_ARGS) $(FUSE_STRING)
 show_fuses:
 	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -nv	
 
 ## Called with no extra definitions, sets to defaults
-set_default_fuses:  FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m 
-#-U efuse:w:$(EFUSE):m 
-set_default_fuses:  fuses
+#set_default_fuses:  FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m -U efuse:w:$(EFUSE):m 
+#set_default_fuses:  fuses
 
 ## Set the fuse byte for full-speed mode 8MHz
 ## Note: can also be set in firmware for modern chips
-set_fast_fuse: LFUSE = 0xe4
-set_fast_fuse: FUSE_STRING = -U lfuse:w:$(LFUSE):m 
+#set_fast_fuse: LFUSE = 0xE4
+#set_fast_fuse: FUSE_STRING = -U lfuse:w:$(LFUSE):m 
 set_fast_fuse: fuses
 
 ## Set the EESAVE fuse byte to preserve EEPROM across flashes
-set_eeprom_save_fuse: HFUSE = 0xf3
-set_eeprom_save_fuse: FUSE_STRING = -U hfuse:w:$(HFUSE):m
-set_eeprom_save_fuse: fuses
+#set_eeprom_save_fuse: HFUSE = 0xD1
+#set_eeprom_save_fuse: FUSE_STRING = -U hfuse:w:$(HFUSE):m
+#set_eeprom_save_fuse: fuses
 
 ## Clear the EESAVE fuse byte
-clear_eeprom_save_fuse: FUSE_STRING = -U hfuse:w:$(HFUSE):m
-clear_eeprom_save_fuse: fuses
+#clear_eeprom_save_fuse: FUSE_STRING = -U hfuse:w:$(HFUSE):m
+#clear_eeprom_save_fuse: fuses
