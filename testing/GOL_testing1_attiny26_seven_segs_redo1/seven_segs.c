@@ -9,9 +9,9 @@
 
 //inline init_digit_pins(void);
 
-const uint16_t digit_bits[] = { DIG_0, DIG_1, DIG_2, DIG_3 };
-//const uint8_t  num_digits = sizeof(digit_bits)/2;
-const uint8_t num_digits = 3;
+const uint8_t digit_bits[] = { DIG_0, DIG_1, DIG_2 };
+const uint8_t  num_digits = sizeof(digit_bits)/2;
+//const uint8_t num_digits = 3;
 
 const uint8_t number_seg_bytes[] = {
 //       unconfigured
@@ -30,8 +30,8 @@ const uint8_t number_seg_bytes[] = {
 };
 
 //uint8_t SPI_out_byte;
-uint16_t digits_out;
-uint8_t out_byte;
+//uint16_t digits_out;
+//uint8_t out_byte;
 
 void init_digit_pins(void){
     
@@ -50,10 +50,9 @@ void init_segment_pins(void){
 
 void write_digit(int8_t num, uint8_t dig){
 	uint8_t k;
+    uint8_t out_byte;
     
-    //put SS/CS low
-    //GPIOA->BRR |= (1<<4);
-	if((num < 10) && (num >= 0)){
+    if((num < 10) && (num >= 0)){
     out_byte = number_seg_bytes[num];
     } else {
     out_byte = number_seg_bytes[10];
@@ -61,15 +60,19 @@ void write_digit(int8_t num, uint8_t dig){
     
     SEGMENT_PORT = out_byte;
     //write_segs(out_byte);
-    
+    //out_byte=PORTB;
 	for( k = 0; k < num_digits; k++){
         
         if ( k == dig ){
                 PORTB |= digit_bits[k];
+                
+                //PORTB |= (1<<k);
 		} else {
                 PORTB &= ~digit_bits[k];
+                //PORTB &= ~(1<<k);
         }
 	}
+    //PORTB |= out_byte;
 	_delay_ms(1);
     
 }

@@ -57,6 +57,9 @@ volatile uint16_t generation_count=0;
 volatile uint8_t timer_overflow_count=0;
 
 #define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
+
+//const uint8_t a_num = 123;
+
 /*inline init_button(void);
 inline init_button(void){
 
@@ -68,6 +71,8 @@ inline init_button(void){
 }*/
 
 void init_timer0(void);
+void init_timer1(void);
+
 void reset_grid(void);
 
 int main(void)
@@ -87,7 +92,8 @@ int main(void)
     
     reset_grid();
     
-    init_timer0();
+    //init_timer0();
+    init_timer1();
     
     #if DO_YOU_WANT_DEBUG==0
     init_digit_pins();
@@ -103,7 +109,7 @@ int main(void)
      //setup all segs as output
     SEGMENT_DDR |= ALL_SEGS;
     */
-    
+    /*
     #if DO_YOU_WANT_DEBUG
     //for debug
     int8_t l = DEBUG_BIT_LEN;
@@ -112,7 +118,7 @@ int main(void)
     l--;
     }//while(l>=0);
     #endif
-    
+    */
     #if DO_YOU_WANT_BUTTON_INT0
     //if you want a button to use INT0 for button on PB6
         
@@ -134,20 +140,21 @@ int main(void)
     sei();
     
     while(1){
-        /*
+        
         //uint16_t g_count;
-        if(update_gen_flag==1){
-        g_count = generation_count;
-        update_gen_flag=0;
-        }*/
+        //if(update_gen_flag){
+        //g_count = generation_count;
+        //update_gen_flag=0;
+        //}
         #if DO_YOU_WANT_DEBUG==0
         //write_number(g_count);
-        write_number(generation_count);
+        //write_number(generation_count);
         #endif
+        write_number(123);
         
-        #if DO_YOU_WANT_DEBUG==1
+        /*#if DO_YOU_WANT_DEBUG==1
         DEBUG_PORT = ~g_count;
-        #endif
+        #endif*/
     }
 }
 
@@ -346,29 +353,45 @@ void init_timer0(void){
 }
 
 
+void init_timer1(void){
+    
+    //set prescaler to CK/16384
+    TCCR1B |= ((1<<CS13)|(1<<CS12)|(1<<CS11)|(1<<CS10));
+    
+    //enable timer1 overflow interrupt
+    TIMSK |= (1<<TOIE1);
+    
+}
+
 //----ISRs-----
 
 
-ISR(TIMER0_OVF0_vect){
+ISR(TIMER1_OVF1_vect){
     //timer overflow
-    
+    /*
     //counts times, so it nows when to actually update the display.
     //because it can't every time it overflows because it would be
     //around 30FPS, and the game of life would go way too fast.
     if(timer_overflow_count<15){
         timer_overflow_count++;
-    } 
-    else{
-        timer_overflow_count=0;//reset the count
+    } */
+    //else{
+        //timer_overflow_count=0;//reset the count
         generation_count++;
         //push framebuffer to the display
-        push_fb();
+        //push_fb();
+        //uint8_t i=0;
+        uint8_t i;
+        for(i=0;i<32;i++){
+            ht1632c_data8((i*2),fb[i]);
+        }
+        
         //generation_count++;
         //get the new states and add them to the framebuffer,
         //or reset the display if there isn't enough action
         get_new_states();
         update_gen_flag=1;
-    }
+    //}
     //update_gen_flag=1;
 }
 
