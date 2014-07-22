@@ -6,27 +6,29 @@
 //#include <stm32f10x.h>
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/pgmspace.h>
 
 //inline init_digit_pins(void);
 
-const uint8_t digit_bits[] = { DIG_0, DIG_1, DIG_2 };
-const uint8_t  num_digits = sizeof(digit_bits)/2;
-//const uint8_t num_digits = 3;
+uint8_t digit_bits[] PROGMEM = { DIG_0, DIG_1, DIG_2 };
+//const uint8_t  num_digits = sizeof(digit_bits)/2;
+const uint8_t num_digits = 3;
 
-const uint8_t number_seg_bytes[] = {
+//const 
+uint8_t number_seg_bytes[]  PROGMEM = {
 //       unconfigured
 //ABCDEFG^
-0b11111100,//0
+0b11111101,//0
 0b01100000,//1
-0b11011010,//2
-0b11110010,//3
+0b11011011,//2
+0b11110011,//3
 0b01100110,//4
-0b10110110,//5
-0b10111110,//6
-0b11100000,//7
-0b11111110,//8
-0b11100110,//9
-0b10011110, //'E' for error
+0b10110111,//5
+0b10111111,//6
+0b11100001,//7
+0b11111111,//8
+0b11100111,//9
+0b10011111, //'E' for error
 };
 
 //uint8_t SPI_out_byte;
@@ -45,6 +47,7 @@ void init_digit_pins(void){
 void init_segment_pins(void){
     //setup all segs as output
     SEGMENT_DDR |= ALL_SEGS;
+    SEGMENT_DDR |= 1<<0;
 }
 
 
@@ -53,22 +56,27 @@ void write_digit(int8_t num, uint8_t dig){
     uint8_t out_byte;
     
     if((num < 10) && (num >= 0)){
-    out_byte = number_seg_bytes[num];
+    //out_byte = number_seg_bytes[num];
+    out_byte = pgm_read_byte(&number_seg_bytes[num]);
     } else {
-    out_byte = number_seg_bytes[10];
+    
+    //out_byte = number_seg_bytes[10];
+    out_byte = pgm_read_byte(&number_seg_bytes[10]);
     }
     
+    //SEGMENT_PORT = 0x00;
     SEGMENT_PORT = out_byte;
     //write_segs(out_byte);
     //out_byte=PORTB;
 	for( k = 0; k < num_digits; k++){
         
         if ( k == dig ){
-                PORTB |= digit_bits[k];
-                
+                //PORTB |= digit_bits[k];
+                PORTB |= pgm_read_byte(&digit_bits[k]);
                 //PORTB |= (1<<k);
 		} else {
-                PORTB &= ~digit_bits[k];
+                //PORTB &= ~(digit_bits[k]);
+                PORTB &= ~(pgm_read_byte(&digit_bits[k]));
                 //PORTB &= ~(1<<k);
         }
 	}
@@ -96,8 +104,14 @@ void write_number(int16_t number){
 		}
 }
 
-/*void write_segs(uint8_t byte){
-    
-    SEGMENT_PORT = byte;
-    
-}*/
+void write_segs(uint8_t byte){
+    uint8_t o;
+    for(o=0;o<8;o++){
+    if(byte & (1<<o)){
+    SEGMENT_PORT |= (1<<o);
+    }
+    else{
+    SEGMENT_PORT &= ~(1<<o);
+    }
+    }
+}

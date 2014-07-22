@@ -9,6 +9,7 @@
 #include <avr/interrupt.h>
 #include "seven_segs.h"
 #include <avr/eeprom.h>
+#include <avr/pgmspace.h>
 
 #define X_AXIS_LEN 32
 #define Y_AXIS_LEN 8
@@ -148,9 +149,9 @@ int main(void)
         //}
         #if DO_YOU_WANT_DEBUG==0
         //write_number(g_count);
-        //write_number(generation_count);
+        write_number(generation_count);
         #endif
-        write_number(123);
+        //write_number(234);
         
         /*#if DO_YOU_WANT_DEBUG==1
         DEBUG_PORT = ~g_count;

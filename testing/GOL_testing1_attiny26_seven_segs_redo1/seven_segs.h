@@ -63,10 +63,10 @@ E       C
 #define INIT_SEGMENT_PINS SEGMENT_DDR |= ALL_SEGS
 
 //#define num_digits 4
-extern const uint8_t digit_bits[];
+//extern const uint8_t digit_bits[];
 extern const uint8_t  num_digits;
 
-extern const uint8_t number_seg_bytes[];
+//extern const uint8_t number_seg_bytes[];
 
 //extern uint8_t SPI_out_byte;
 //extern uint16_t digits_out;
