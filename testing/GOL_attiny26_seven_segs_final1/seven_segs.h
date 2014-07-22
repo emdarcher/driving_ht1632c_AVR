@@ -1,3 +1,6 @@
+//my small little library for driving multiplexed seven segment displays
+
+
 //header file with seven segment stuff
 
 #ifndef SEVEN_SEGS
@@ -38,7 +41,7 @@ E       C
 #define SEGMENT_DDR DDRA
 #define SEGMENT_PORT PORTA
 
-//these are the bits 
+//these are the bits of a AVR port
 //that go to particular segments
 #define SEG_A (1<<6)
 #define SEG_B (1<<5)
@@ -64,6 +67,7 @@ E       C
 #define DIGIT_DELAY_MS 1 //ms to wait before switching to next digit
 
 //extern const uint8_t digit_bits[];
+
 extern const uint8_t  num_digits;
 
 void init_digit_pins(void);
@@ -74,7 +78,7 @@ void msg_error(void);
 void write_number(int16_t number);
 void write_digit(int8_t num, uint8_t dig);
 
-void write_segs(uint8_t byte);
+//void write_segs(uint8_t byte);
 
 
 #endif

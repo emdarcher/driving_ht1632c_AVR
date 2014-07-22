@@ -5,7 +5,7 @@
 #include "ht1632c.h"
 
 #include <avr/io.h>
-//#include <stdio.h>
+
 
 /* set this to the port the controller is connected to */
 #define HT1632C_PORT        PORTB

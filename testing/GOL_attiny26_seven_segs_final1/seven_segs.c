@@ -1,9 +1,9 @@
-
+//my small little library for driving multiplexed seven segment displays
 
 //the functions
 
 #include "seven_segs.h"
-//#include <stm32f10x.h>
+
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
@@ -33,14 +33,12 @@ uint8_t number_seg_bytes[]  PROGMEM = {
 void init_digit_pins(void){
     
     //setup bits 0-2 in DDRB for output for digits 0-2
-    //DDRB |= (DIG_0|DIG_1|DIG_2);
     DDRB |= ALL_DIGS;
 }
 
 void init_segment_pins(void){
     //setup all segs as output
     SEGMENT_DDR |= ALL_SEGS;
-    //SEGMENT_DDR |= 1<<0;
 }
 
 
@@ -91,6 +89,7 @@ void write_number(int16_t number){
         }
 }
 
+/*
 void write_segs(uint8_t byte){
     uint8_t o;
     for(o=0;o<8;o++){
@@ -101,4 +100,4 @@ void write_segs(uint8_t byte){
     SEGMENT_PORT &= ~(1<<o);
     }
     }
-}
+}*/
