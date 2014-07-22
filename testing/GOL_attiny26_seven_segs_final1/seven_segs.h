@@ -40,13 +40,13 @@ E       C
 
 //these are the bits 
 //that go to particular segments
-#define SEG_A (1<<7)
-#define SEG_B (1<<6)
-#define SEG_C (1<<5)
-#define SEG_D (1<<4)
-#define SEG_E (1<<3)
-#define SEG_F (1<<2)
-#define SEG_G (1<<1)
+#define SEG_A (1<<6)
+#define SEG_B (1<<5)
+#define SEG_C (1<<4)
+#define SEG_D (1<<3)
+#define SEG_E (1<<2)
+#define SEG_F (1<<1)
+#define SEG_G (1<<0)
 
 #define ALL_SEGS ( SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G )
 
@@ -55,22 +55,16 @@ E       C
 #define DIG_0 (1<<0)
 #define DIG_1 (1<<1)
 #define DIG_2 (1<<2)
-#define DIG_3 (1<<0)//note this goes on PORTA
 
 //remember to add any newly defines digits here
-#define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 | DIG_3 )
+#define ALL_DIGS ( DIG_0 | DIG_1 | DIG_2 )
 
 #define INIT_SEGMENT_PINS SEGMENT_DDR |= ALL_SEGS
 
-//#define num_digits 4
+#define DIGIT_DELAY_MS 1 //ms to wait before switching to next digit
+
 //extern const uint8_t digit_bits[];
 extern const uint8_t  num_digits;
-
-//extern const uint8_t number_seg_bytes[];
-
-//extern uint8_t SPI_out_byte;
-//extern uint16_t digits_out;
-//extern uint8_t out_byte;
 
 void init_digit_pins(void);
 void init_segment_pins(void);

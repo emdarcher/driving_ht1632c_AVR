@@ -1,15 +1,15 @@
-//program to test a library I found for the ht1632c
-//just makes a line travel across the display
-
+//displays Conway's Game of Life on a ht1632c-based 32x8 LED Matrix
+//and counts the generations on 3 multiplexed 7 segment displays
 #include <avr/io.h>
-//#include <stdio.h>
 #include <stdlib.h>
 #include <util/delay.h>
-#include "ht1632c.h"
 #include <avr/interrupt.h>
-#include "seven_segs.h"
 #include <avr/eeprom.h>
 #include <avr/pgmspace.h>
+
+#include "ht1632c.h"
+#include "seven_segs.h"
+
 
 #define X_AXIS_LEN 32
 #define Y_AXIS_LEN 8
@@ -57,18 +57,18 @@ volatile uint16_t generation_count=0;
 
 volatile uint8_t timer_overflow_count=0;
 
-#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
+//#define INIT_BUTTON BUTTON_DDR &= ~(1<<BUTTON_BIT);BUTTON_PORT |= (1<<BUTTON_BIT);
 
 //const uint8_t a_num = 123;
 
-/*inline init_button(void);
+void init_button(void);
+/*
 inline init_button(void){
 
     BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
     BUTTON_PORT |= (1<<BUTTON_BIT);
     
-
 }*/
 
 void init_timer0(void);
@@ -82,8 +82,8 @@ int main(void)
     ht1632c_init();
     
     #if DO_YOU_WANT_BUTTON_INT0==0
-    //init_button();
-    INIT_BUTTON;
+    init_button();
+    //INIT_BUTTON;
     
     /*BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
@@ -174,15 +174,14 @@ void push_fb(void){
         j+=2;
     }
 }
-/*
-static inline init_button(void){
+
+void init_button(void){
 
     BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
     BUTTON_PORT |= (1<<BUTTON_BIT);
     
-
-}*/
+}
 
 void reset_grid(void){
 
@@ -326,22 +325,22 @@ void get_new_states(void){
 //from other code
 uint8_t get_difference(uint8_t a[],uint8_t b[])
 {
-	uint8_t x_v,y_v,diff=0;
+    uint8_t x_v,y_v,diff=0;
 
-	for(x_v=0; x_v < X_AXIS_LEN; x_v++)
-	//while(x_v--)
+    for(x_v=0; x_v < X_AXIS_LEN; x_v++)
+    //while(x_v--)
     {
-		for(y_v=0; y_v < Y_AXIS_LEN; y_v++)
-		//while(y_v--)
+        for(y_v=0; y_v < Y_AXIS_LEN; y_v++)
+        //while(y_v--)
         {
-			if(( (get_current_pixel_state(a,x_v,y_v)==1) && (get_current_pixel_state(b,x_v,y_v) == 0)) 
+            if(( (get_current_pixel_state(a,x_v,y_v)==1) && (get_current_pixel_state(b,x_v,y_v) == 0)) 
             || ((get_current_pixel_state(a,x_v,y_v)==0) && (get_current_pixel_state(b,x_v,y_v)==1)))
             {
             diff++;
             }
-		}
-	}
-	return diff;
+        }
+    }
+    return diff;
 }
 
 void init_timer0(void){

@@ -7,8 +7,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/pgmspace.h>
-
-//inline init_digit_pins(void);
+#include <avr/eeprom.h>
 
 uint8_t digit_bits[] PROGMEM = { DIG_0, DIG_1, DIG_2 };
 //const uint8_t  num_digits = sizeof(digit_bits)/2;
@@ -31,28 +30,22 @@ uint8_t number_seg_bytes[]  PROGMEM = {
 0b10011111, //'E' for error
 };
 
-//uint8_t SPI_out_byte;
-//uint16_t digits_out;
-//uint8_t out_byte;
-
 void init_digit_pins(void){
     
-    //setup bit 0 in DDRA for output for digit 3
-    //DDRA |= DIG_3;
     //setup bits 0-2 in DDRB for output for digits 0-2
-    DDRB |= (DIG_0|DIG_1|DIG_2);
-    
+    //DDRB |= (DIG_0|DIG_1|DIG_2);
+    DDRB |= ALL_DIGS;
 }
 
 void init_segment_pins(void){
     //setup all segs as output
     SEGMENT_DDR |= ALL_SEGS;
-    SEGMENT_DDR |= 1<<0;
+    //SEGMENT_DDR |= 1<<0;
 }
 
 
 void write_digit(int8_t num, uint8_t dig){
-	uint8_t k;
+    uint8_t k;
     uint8_t out_byte;
     
     if((num < 10) && (num >= 0)){
@@ -64,44 +57,38 @@ void write_digit(int8_t num, uint8_t dig){
     out_byte = pgm_read_byte(&number_seg_bytes[10]);
     }
     
-    //SEGMENT_PORT = 0x00;
+    //output the byte to the port, shit right 1 bit to correctly
+    //use the values from number_seg_bytes.
     SEGMENT_PORT = (out_byte>>1);
-    //write_segs(out_byte);
-    //out_byte=PORTB;
-	for( k = 0; k < num_digits; k++){
-        
+    
+    for( k = 0; k < num_digits; k++){
         if ( k == dig ){
-                //PORTB |= digit_bits[k];
                 PORTB |= pgm_read_byte(&digit_bits[k]);
-                //PORTB |= (1<<k);
-		} else {
-                //PORTB &= ~(digit_bits[k]);
+        } else {
                 PORTB &= ~(pgm_read_byte(&digit_bits[k]));
-                //PORTB &= ~(1<<k);
         }
-	}
-    //PORTB |= out_byte;
-	_delay_ms(1);
+    }
+    _delay_ms(DIGIT_DELAY_MS);
     
 }
 
 void msg_error(void){
-	write_digit(10, 0);
+    write_digit(10, 0);
 }
 
 void write_number(int16_t number){
-		uint8_t h;
-		int16_t format_num = number;
-		//check if number is too big ot not
-		if ((number < 1000) && (number >= 0)){
-			//formats number based on digits to correct digits on display
-			for(h=0;h < num_digits;h++){
-				write_digit(format_num % 10, h);
-				format_num /= 10;
-			}         
-		} else {
-			msg_error();
-		}
+        uint8_t h;
+        int16_t format_num = number;
+        //check if number is too big ot not
+        if ((number < 1000) && (number >= 0)){
+            //formats number based on digits to correct digits on display
+            for(h=0;h < num_digits;h++){
+                write_digit(format_num % 10, h);
+                format_num /= 10;
+            }         
+        } else {
+            msg_error();
+        }
 }
 
 void write_segs(uint8_t byte){
