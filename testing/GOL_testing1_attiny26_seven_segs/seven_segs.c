@@ -62,34 +62,16 @@ void write_digit(int8_t num, uint8_t dig){
     SEGMENT_PORT = out_byte;
     //write_segs(out_byte);
     
-	//write_SPI1(SPI_out_byte);
-    //SPI1->DR = SPI_out_byte;
 	for( k = 0; k < num_digits; k++){
-		//uint8_t digit_port = (dig==3) ? PORTA : PORTB;
         
         if ( k == dig ){
-			//if(dig==3)
-           // {
-            //    PORTA |= digit_bits[k];
-            //}else{
                 PORTB |= digit_bits[k];
-            //}
-            //digit_port |= digit_bits[k];
 		} else {
-			//digits_out &= ~(digit_bits[k]);
-            //GPIOC->BRR |= (digit_bits[k]);
-            //digit_port &= ~(digit_bits[k]);
-            //if(dig==3)
-            //{
-            //    PORTA &= ~digit_bits[k];
-            //}else{
                 PORTB &= ~digit_bits[k];
-            //}
         }
 	}
-    //GPIOA->BSRR |= (1<<4); //put SS/CS high again to latch shift register
-	//_delay_ms(1);
-    //Delay(1);
+	_delay_ms(1);
+    
 }
 
 void msg_error(void){
