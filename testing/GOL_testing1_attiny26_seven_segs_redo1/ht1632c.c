@@ -194,7 +194,7 @@ ht1632c_init(void)
 	ht1632c_slave(1); /* master mode */
 	ht1632c_clock(0); /* internal RC clock */
 	ht1632c_opts(0);  /* 0: 8 commons, n-mos outputs */
-	ht1632c_bright(7);
+	ht1632c_bright(7);//set brightness to 7/16 pwm
 
 	/* clear buffer memory */
 	for(i=0;i<64;i++)

@@ -65,7 +65,7 @@ void write_digit(int8_t num, uint8_t dig){
     }
     
     //SEGMENT_PORT = 0x00;
-    SEGMENT_PORT = out_byte;
+    SEGMENT_PORT = (out_byte>>1);
     //write_segs(out_byte);
     //out_byte=PORTB;
 	for( k = 0; k < num_digits; k++){
