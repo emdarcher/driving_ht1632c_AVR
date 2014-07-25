@@ -10,8 +10,10 @@
 #include <avr/eeprom.h>
 
 uint8_t digit_bits[] PROGMEM = { DIG_0, DIG_1, DIG_2 };
-//const uint8_t  num_digits = sizeof(digit_bits)/2;
+//const uint8_t  num_digits = sizeof(digit_bits);
 const uint8_t num_digits = 3;
+//#define num_digits 3
+
 
 //const 
 uint8_t number_seg_bytes[]  PROGMEM = {
@@ -78,7 +80,7 @@ void write_number(int16_t number){
         uint8_t h;
         int16_t format_num = number;
         //check if number is too big ot not
-        if ((number < 1000) && (number >= 0)){
+        if ((number <= 999) && (number >= 0)){
             //formats number based on digits to correct digits on display
             for(h=0;h < num_digits;h++){
                 write_digit(format_num % 10, h);

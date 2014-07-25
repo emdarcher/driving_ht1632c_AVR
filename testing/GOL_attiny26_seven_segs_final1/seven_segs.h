@@ -68,7 +68,7 @@ E       C
 
 //extern const uint8_t digit_bits[];
 
-extern const uint8_t  num_digits;
+//extern const uint8_t  num_digits;
 
 void init_digit_pins(void);
 void init_segment_pins(void);
