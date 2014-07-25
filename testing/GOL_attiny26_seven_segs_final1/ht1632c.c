@@ -201,9 +201,10 @@ ht1632c_init(void)
     ht1632c_bright(7);//set brightness to 7/16 pwm
 
     /* clear buffer memory */
-    for(i=0;i<64;i++)
+    for(i=0;i<64;i++){
         ht1632c_data4(i,i);
-
+    }
+    
     ht1632c_ledonoff(1); /* turn on */
 }
 

@@ -136,7 +136,7 @@ void push_fb(void){
 }
 
 void init_button(void){
-    //setup for output
+    //setup for input
     BUTTON_DDR &= ~(1<<BUTTON_BIT);
     //enable pullup
     BUTTON_PORT |= (1<<BUTTON_BIT);
